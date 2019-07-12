@@ -83,7 +83,10 @@ def GetOuterRing(Data, BG, XpixArray, YpixArray):
 
     for i in range(NofYpixel):
         for j in range(NofXpixel):
-            if((ImgOuterRing[i][j]/numpy.max(ImgOuterRing) < 0.3) or (ImgOuterRing[i][j]/numpy.max(ImgOuterRing) > 0.5)):
+
+            #FY2019
+            if((ImgOuterRing[i][j]/numpy.max(ImgOuterRing) < 0.4) or (ImgOuterRing[i][j]/numpy.max(ImgOuterRing) > 0.5)):
+            #if((ImgOuterRing[i][j]/numpy.max(ImgOuterRing) < 0.5) or (ImgOuterRing[i][j]/numpy.max(ImgOuterRing) > 5.0)):
                 continue
             XcArray.append(XpixArray[j])
             YcArray.append(YpixArray[i])
@@ -103,8 +106,8 @@ def GetOuterRing(Data, BG, XpixArray, YpixArray):
 def GetInnerRing(Data, XpixArray, YpixArray):
 
     #fit parameter
-    RangePixel = 1.05
-    RangeStd = 0.50
+    RangePixel = 1.08
+    RangeStd = 0.5
 
     #pixels
     NofXpixel = len(XpixArray)
@@ -138,7 +141,13 @@ def GetInnerRing(Data, XpixArray, YpixArray):
 
     XcArray = numpy.array(XcArray)
     YcArray = numpy.array(YcArray)
-    
+
+    #filtering
+    XcArray = XcArray[numpy.where((YcArray > numpy.median(YcArray) - 2.5) & (YcArray < numpy.median(YcArray) + 2.5))]
+    YcArray = YcArray[numpy.where((YcArray > numpy.median(YcArray) - 2.5) & (YcArray < numpy.median(YcArray) + 2.5))]
+    YcArray = YcArray[numpy.where((XcArray > numpy.median(XcArray) - 2.5) & (XcArray < numpy.median(XcArray) + 2.5))]
+    XcArray = XcArray[numpy.where((XcArray > numpy.median(XcArray) - 2.5) & (XcArray < numpy.median(XcArray) + 2.5))]
+
     RcArray = numpy.sqrt(XcArray**2 + YcArray**2)
 
     RcMean = numpy.min(numpy.array([numpy.mean(RcArray), numpy.median(RcArray)]))
@@ -185,7 +194,7 @@ ImgBG = cv2.imread(FileBG, -1)
 
 #triming
 if(FY >= 2018):
-    TrimRegion = 30
+    TrimRegion = 35
     Img = Trimming(Img, TrimRegion)
     ImgBG = Trimming(ImgBG, TrimRegion)
     pass
