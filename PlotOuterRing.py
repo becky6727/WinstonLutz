@@ -6,6 +6,18 @@ import argparse
 from scipy.signal import argrelmin
 import lib.FitRing as FitRing
 
+#---- trimming image ----# 
+def Trimming(ImgArray, TrimSize = 30):
+
+    #TrimSize = 30
+    Width = ImgArray.shape[1]
+    Height = ImgArray.shape[0]
+    
+    Img = ImgArray[TrimSize:(Height - TrimSize), TrimSize:(Width - TrimSize)]
+
+    return Img
+#---- end of function ----#
+
 #options
 parser = argparse.ArgumentParser(description = 'options')
 
@@ -52,32 +64,36 @@ if(not(os.path.isfile(FileBG))):
 Img = cv2.imread(FileIN, -1)
 ImgBG = cv2.imread(FileBG, -1)
 
+
+#triming
+TrimRegion = 35
+Img = Trimming(Img, TrimRegion)
+ImgBG = Trimming(ImgBG, TrimRegion)
+
 #set axis(pixel -> mm)
 HeightImg = int(Img.shape[0])
 WidthImg = int(Img.shape[1])
-
-SizeImg = numpy.minimum(HeightImg, WidthImg)
 
 inch2mm = 25.4
 
 XArray = []
 YArray = []
 
-for x_pixel in range(SizeImg):
+for x_pixel in range(WidthImg):
     tmp = x_pixel* (inch2mm/DPI)
     XArray.append(tmp)
     pass
 
-for y_pixel in range(SizeImg):
+for y_pixel in range(HeightImg):
     tmp = y_pixel* (inch2mm/DPI)
     YArray.append(tmp)
     pass
 
 #show red-pixel
-RedArray = [[] for i in range(SizeImg)]
+RedArray = [[] for i in range(len(YArray))]
 
-for i in range(SizeImg):
-    for j in range(SizeImg):
+for i in range(len(YArray)):
+    for j in range(len(XArray)):
         RedArray[i].append(Img[i][j][2])
         pass
     pass
@@ -96,6 +112,8 @@ BG = numpy.mean(numpy.array(BGArray))
 ImgOuterRing = numpy.absolute(RedArray - BG)
 #ImgOuterRing = RedArray - BG
 
+#print ImgOuterRing
+
 #fit outer ring
 XcArray = []
 YcArray = []
@@ -112,6 +130,8 @@ for i in range(len(YArray)):
 XcArray = numpy.array(XcArray)
 YcArray = numpy.array(YcArray)
 RcArray = numpy.sqrt(XcArray**2 + YcArray**2)
+
+print XcArray, YcArray
 
 ObjOuter = FitRing.FitRing(XcArray, YcArray)
 XcOut, YcOut, Rout = ObjOuter.DoFit()
@@ -135,13 +155,13 @@ XBinWidth = inch2mm/DPI
 MinX = XArray[0]
 MaxX = XArray[-1]
 #NofXBin = int((MaxX - MinX)/XBinWidth)
-NofXBin = SizeImg
+NofXBin = len(XArray)
 
 YBinWidth = inch2mm/DPI
 MinY = YArray[0]
 MaxY = YArray[-1]
 #NofYBin = int((MaxY - MinY)/YBinWidth)
-NofYBin = SizeImg
+NofYBin = len(YArray)
 
 hMap = ROOT.TH2D('hMap', 'Winston Lutz', NofXBin, MinX, MaxX, NofYBin, MinY, MaxY)
 
