@@ -92,7 +92,7 @@ def GetOuterRing(Data, BG, XpixArray, YpixArray):
 
     for i in range(NofYpixel):
         for j in range(NofXpixel):
-            if((ImgOuterRing[i][j]/numpy.max(ImgOuterRing) < 0.3) or (ImgOuterRing[i][j]/numpy.max(ImgOuterRing) > 0.5)):
+            if((ImgOuterRing[i][j]/numpy.max(ImgOuterRing) < 0.4) or (ImgOuterRing[i][j]/numpy.max(ImgOuterRing) > 0.5)):
                 continue
             XcArray.append(XpixArray[j])
             YcArray.append(YpixArray[i])
@@ -112,7 +112,7 @@ def GetOuterRing(Data, BG, XpixArray, YpixArray):
 def GetInnerRing(Data, XpixArray, YpixArray):
     
     #fit parameter
-    RangePixel = 1.05
+    RangePixel = 1.10
     RangeStd = 0.50
 
     #pixels
