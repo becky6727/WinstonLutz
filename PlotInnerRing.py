@@ -56,7 +56,7 @@ def Trimming(ImgArray, TrimSize = 30):
     return Img
 #---- end of function ----#
 
-TrimRegion = 30
+TrimRegion = 35
 Img = cv2.imread(FileIN, -1)
 Img = Trimming(Img, TrimRegion)
 
@@ -99,7 +99,7 @@ YcArray = []
 
 MinImg = numpy.min(ImgInnerRing[numpy.where(ImgInnerRing > 5.0e4)])
 
-RangePixel = 1.05
+RangePixel = 1.08
 RangeStd = 0.5
 
 for i in range(len(YArray)):
@@ -113,6 +113,13 @@ for i in range(len(YArray)):
 
 XcArray = numpy.array(XcArray)
 YcArray = numpy.array(YcArray)
+
+#filtering
+XcArray = XcArray[numpy.where((YcArray > numpy.median(YcArray) - 2.5) & (YcArray < numpy.median(YcArray) + 2.5))]
+YcArray = YcArray[numpy.where((YcArray > numpy.median(YcArray) - 2.5) & (YcArray < numpy.median(YcArray) + 2.5))]
+YcArray = YcArray[numpy.where((XcArray > numpy.median(XcArray) - 2.5) & (XcArray < numpy.median(XcArray) + 2.5))]
+XcArray = XcArray[numpy.where((XcArray > numpy.median(XcArray) - 2.5) & (XcArray < numpy.median(XcArray) + 2.5))]
+
 RcArray = numpy.sqrt(XcArray**2 + YcArray**2)
 RatioArray = YcArray/XcArray
 
@@ -130,6 +137,8 @@ AngleArray =  numpy.arctan2(YcArray - numpy.mean(YcArray), XcArray - numpy.mean(
 
 print RcMean
 print RcStd
+print numpy.mean(XcArray)
+print numpy.mean(YcArray)
 print AngleArray
 
 XcArray = XcArray[numpy.where((RcArray > RcMean - 1.0* RcStd) & (RcArray < RcMean + RcStd))]
